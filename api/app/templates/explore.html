@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Temple Fitness — Elite bodybuilding, cinematic athletic conditioning, and sub-second keyless access. Build your strongest self.">
+    <title>TEMPLE FITNESS — Build Your Strongest Self</title>
+    
+    <!-- Google Fonts: Bebas Neue for bold cinematic headlines, Inter for clean copy, Oswald for tags -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/static/css/public.css?v=3.0">
+</head>
+<body class="gym-theme-dark">
+    <!-- Scroll Progress Indicator -->
+    <div id="scroll-progress" aria-hidden="true"></div>
+
+    <!-- Navigation Bar -->
+    <header class="site-header" id="main-nav">
+        <div class="nav-container">
+            <a href="#hero" class="brand-logo" aria-label="Temple Fitness Home">
+                <span class="logo-text">TEMPLE</span>
+                <span class="logo-accent">FITNESS</span>
+                <span class="logo-dot"></span>
+            </a>
+
+            <nav class="nav-links" id="nav-menu">
+                <a href="#hero" class="nav-link active">Home</a>
+                <a href="#bench-experience" class="nav-link">The Bench</a>
+                <a href="#programs" class="nav-link">Programs</a>
+                <a href="#about-transition" class="nav-link">Philosophy</a>
+                <a href="#stats" class="nav-link">Trainers</a>
+                <a href="#memberships" class="nav-link">Membership</a>
+            </nav>
+
+            <div class="nav-actions">
+                <a href="/media" class="nav-link-subtle" title="Facility Gallery">Gallery</a>
+                <a href="/logs" class="nav-link-subtle" title="Owner Attendance Logs">Owner Log</a>
+                <a href="/login" class="nav-link-subtle" title="Staff Portal">Staff</a>
+                <a href="#memberships" class="btn-nav-join">JOIN NOW</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- ── HERO SECTION ── -->
+        <section class="hero-section" id="hero">
+            <div class="hero-content-wrapper">
+                <div class="hero-text-col">
+                    <div class="hero-tagline">
+                        <span class="tagline-bullet"></span>
+                        DISCIPLINE. STRENGTH. CONSISTENCY.
+                    </div>
+
+                    <h1 class="hero-heading">
+                        BUILD YOUR<br>
+                        <span class="text-accent-red">STRONGEST</span> SELF.
+                    </h1>
+
+                    <p class="hero-description">
+                        Push beyond your limits. Train with purpose. Become the strongest version of yourself in a sanctuary engineered for uncompromising athletes.
+                    </p>
+
+                    <div class="hero-cta-group">
+                        <a href="#memberships" class="btn-primary-red">JOIN NOW</a>
+                        <a href="#programs" class="btn-secondary-dark">EXPLORE PROGRAMS</a>
+                    </div>
+
+                    <div class="hero-mini-stats">
+                        <div class="mini-stat-item">
+                            <span class="mini-stat-val">{{ today_count if today_count else '142' }}</span>
+                            <span class="mini-stat-lbl">TODAY'S LIFTERS</span>
+                        </div>
+                        <div class="mini-stat-sep"></div>
+                        <div class="mini-stat-item">
+                            <span class="mini-stat-val">24/7</span>
+                            <span class="mini-stat-lbl">RFID ACCESS</span>
+                        </div>
+                        <div class="mini-stat-sep"></div>
+                        <div class="mini-stat-item">
+                            <span class="mini-stat-val">&lt; 180ms</span>
+                            <span class="mini-stat-lbl">GATE SPEED</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-visual-col">
+                    <div class="hero-image-frame">
+                        <img src="/static/img/hero_athlete.jpg" alt="Elite bodybuilder training with intense focus" class="hero-athlete-img" id="hero-img">
+                        <div class="hero-image-vignette"></div>
+                        <div class="hero-red-rim-glow"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scroll Indicator -->
+            <a href="#bench-experience" class="hero-scroll-prompt" aria-label="Scroll to experience the bench press animation">
+                <span class="scroll-prompt-text">SCROLL TO EXPERIENCE</span>
+                <div class="scroll-prompt-chevron"></div>
+            </a>
+        </section>
+
+        <!-- ── SIGNATURE BENCH PRESS SCROLL SECTION ── -->
+        <section class="bench-scroll-container" id="bench-experience">
+            <div class="bench-sticky-viewport">
+                <!-- Canvas Renderer for Biomechanical Bench Press -->
+                <canvas id="bench-canvas" width="1920" height="1080" aria-label="Interactive scroll-driven bench press animation"></canvas>
+
+                <!-- Dramatic Red Spot Vignette -->
+                <div class="bench-spotlight-layer"></div>
+                <div class="bench-red-lighting-overlay" id="bench-red-overlay"></div>
+
+                <!-- Bench Telemetry HUD -->
+                <div class="bench-telemetry-hud">
+                    <div class="hud-item">
+                        <span class="hud-label">EXECUTION</span>
+                        <span class="hud-value" id="hud-phase-label">LOCKED OUT</span>
+                    </div>
+                    <div class="hud-item">
+                        <span class="hud-label">BAR HEIGHT</span>
+                        <span class="hud-value" id="hud-height-val">100%</span>
+                    </div>
+                    <div class="hud-item">
+                        <span class="hud-label">TENSION</span>
+                        <span class="hud-value text-accent-red" id="hud-tension-val">OPTIMAL</span>
+                    </div>
+                </div>
+
+                <!-- Cinematic Sequence Overlay Texts (Swapped by Scroll Progress) -->
+                <div class="bench-text-overlay" id="bench-phase-a">
+                    <div class="phase-tag">PHASE 01 // ENTERING THE ARENA</div>
+                    <h2 class="phase-heading">EVERY REP COUNTS.</h2>
+                    <p class="phase-sub">Every set is an opportunity to outwork yesterday. Tighten your grip, plant your feet, and prepare for the load.</p>
+                </div>
+
+                <div class="bench-text-overlay" id="bench-phase-b">
+                    <div class="phase-tag">PHASE 02 // ECCENTRIC CONTROL</div>
+                    <h2 class="phase-heading">CONTROL THE WEIGHT.</h2>
+                    <p class="phase-sub">Elbows tucked, chest high, shoulder blades pinned into the bench. Lower the barbell with deliberate, unyielding precision.</p>
+                </div>
+
+                <div class="bench-text-overlay" id="bench-phase-c">
+                    <div class="phase-tag">PHASE 03 // CONCENTRIC DRIVE</div>
+                    <h2 class="phase-heading"><span class="text-accent-red">PUSH BEYOND</span> YOUR LIMITS.</h2>
+                    <p class="phase-sub">Drive through the heels, engage your pecs and triceps, and accelerate the bar back to the heavens with raw explosive force.</p>
+                </div>
+
+                <div class="bench-text-overlay" id="bench-phase-d">
+                    <div class="phase-tag">PHASE 04 // REP COMPLETE</div>
+                    <h2 class="phase-heading">STRENGTH IS EARNED.</h2>
+                    <p class="phase-sub">Full lockout achieved. Greatness isn't given; it is forged one agonizing, beautiful repetition at a time.</p>
+                </div>
+
+                <!-- Scroll Progress Bar inside Sticky Viewport -->
+                <div class="bench-scrub-bar">
+                    <div class="bench-scrub-track">
+                        <div class="bench-scrub-thumb" id="bench-thumb"></div>
+                    </div>
+                    <div class="bench-scrub-label">REP PROGRESS</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── TRANSITION SECTION: STRENGTH IS EARNED ── -->
+        <section class="transition-section" id="about-transition">
+            <div class="section-wrapper text-center">
+                <div class="section-tag-red">THE TEMPLE DOCTRINE</div>
+                <h2 class="massive-headline scroll-reveal">STRENGTH IS EARNED.</h2>
+                <div class="red-divider-line" id="philosophy-divider"></div>
+                <p class="lead-statement scroll-reveal">
+                    Progress comes from showing up, putting in the work, and pushing beyond yesterday's limits. No shortcuts. No hollow promises. Just cold iron, fierce discipline, and measurable transformation.
+                </p>
+
+                <div class="pillars-grid">
+                    <div class="pillar-card scroll-reveal">
+                        <div class="pillar-number">01</div>
+                        <h3 class="pillar-title">BIOMECHANICAL RIGOR</h3>
+                        <p class="pillar-desc">Equipment sourced specifically for optimal resistance curves, protecting joints while maximizing hypertrophy and power output.</p>
+                    </div>
+
+                    <div class="pillar-card scroll-reveal">
+                        <div class="pillar-number">02</div>
+                        <h3 class="pillar-title">FRICTIONLESS ACCESS</h3>
+                        <p class="pillar-desc">Custom sub-second RFID keyless entrance gates. No front-desk queues or paperwork stand between you and your iron sanctuary.</p>
+                    </div>
+
+                    <div class="pillar-card scroll-reveal">
+                        <div class="pillar-number">03</div>
+                        <h3 class="pillar-title">UNCOMPROMISING CULTURE</h3>
+                        <p class="pillar-desc">An atmosphere reserved for lifters who take their craft seriously. High standards, deep respect, and zero distractions.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── TRAINING PROGRAMS SECTION ── -->
+        <section class="programs-section" id="programs">
+            <div class="section-wrapper">
+                <div class="section-header-row">
+                    <div>
+                        <div class="section-tag-red">ELITE METHODOLOGY</div>
+                        <h2 class="section-heading">TRAINING PROGRAMS</h2>
+                    </div>
+                    <p class="section-intro-text">
+                        Tailored training systems built by certified strength coaches and competitive bodybuilders to trigger maximal adaptation.
+                    </p>
+                </div>
+
+                <div class="programs-grid">
+                    <!-- Program 1: Strength Training -->
+                    <div class="program-card scroll-reveal">
+                        <div class="program-img-wrapper">
+                            <img src="/static/img/program_strength.jpg" alt="Heavy barbell strength training" class="program-img" loading="lazy">
+                            <div class="program-overlay"></div>
+                            <span class="program-badge">STRENGTH</span>
+                        </div>
+                        <div class="program-body">
+                            <h3 class="program-title">STRENGTH TRAINING</h3>
+                            <p class="program-desc">
+                                Master the squat, bench press, deadlift, and overhead press. Built upon scientific linear and undulating periodization for record-breaking power.
+                            </p>
+                            <a href="#memberships" class="btn-program-cta">
+                                <span>EXPLORE PROGRAM</span>
+                                <span class="arrow-glyph">→</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Program 2: Muscle Building -->
+                    <div class="program-card scroll-reveal">
+                        <div class="program-img-wrapper">
+                            <img src="/static/img/program_muscle.jpg" alt="Muscular male bodybuilder dumbbell training" class="program-img" loading="lazy">
+                            <div class="program-overlay"></div>
+                            <span class="program-badge">HYPERTROPHY</span>
+                        </div>
+                        <div class="program-body">
+                            <h3 class="program-title">MUSCLE BUILDING</h3>
+                            <p class="program-desc">
+                                High-volume muscle hypertrophy systems focusing on mechanical tension, metabolic stress, and peak mind-muscle contraction across all muscle groups.
+                            </p>
+                            <a href="#memberships" class="btn-program-cta">
+                                <span>EXPLORE PROGRAM</span>
+                                <span class="arrow-glyph">→</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Program 3: Personal Training -->
+                    <div class="program-card scroll-reveal">
+                        <div class="program-img-wrapper">
+                            <img src="/static/img/program_trainer.jpg" alt="Dedicated personal trainer coaching athlete" class="program-img" loading="lazy">
+                            <div class="program-overlay"></div>
+                            <span class="program-badge">1-ON-1 COACHING</span>
+                        </div>
+                        <div class="program-body">
+                            <h3 class="program-title">PERSONAL TRAINING</h3>
+                            <p class="program-desc">
+                                Personalized biomechanical assessments, customized nutritional protocols, form auditing, and weekly progress calibration with master coaches.
+                            </p>
+                            <a href="#memberships" class="btn-program-cta">
+                                <span>EXPLORE PROGRAM</span>
+                                <span class="arrow-glyph">→</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── GYM STATISTICS SECTION ── -->
+        <section class="stats-section" id="stats">
+            <div class="section-wrapper">
+                <div class="stats-banner scroll-reveal">
+                    <div class="stat-block">
+                        <div class="stat-number-row">
+                            <span class="stat-counter" data-count="500">0</span><span class="stat-plus text-accent-red">+</span>
+                        </div>
+                        <span class="stat-label">MEMBERS</span>
+                    </div>
+
+                    <div class="stat-separator"></div>
+
+                    <div class="stat-block">
+                        <div class="stat-number-row">
+                            <span class="stat-counter" data-count="15">0</span><span class="stat-plus text-accent-red">+</span>
+                        </div>
+                        <span class="stat-label">EXPERT TRAINERS</span>
+                    </div>
+
+                    <div class="stat-separator"></div>
+
+                    <div class="stat-block">
+                        <div class="stat-number-row">
+                            <span class="stat-counter-text">24/7</span>
+                        </div>
+                        <span class="stat-label">ACCESS</span>
+                    </div>
+
+                    <div class="stat-separator"></div>
+
+                    <div class="stat-block">
+                        <div class="stat-number-row">
+                            <span class="stat-counter" data-count="100">0</span><span class="stat-plus text-accent-red">%</span>
+                        </div>
+                        <span class="stat-label">DEDICATION</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── MEMBERSHIP SECTION ── -->
+        <section class="membership-section" id="memberships">
+            <div class="section-wrapper">
+                <div class="section-header-center">
+                    <div class="section-tag-red">PRICING & PASSES</div>
+                    <h2 class="section-heading">MEMBERSHIP TIERS</h2>
+                    <p class="section-sub-center">
+                        Transparent, contract-free membership tiers. Every tier includes frictionless contactless RFID access.
+                    </p>
+                </div>
+
+                <div class="pricing-grid">
+                    <!-- Plan 1: BASIC -->
+                    <div class="pricing-card scroll-reveal">
+                        <div class="pricing-card-header">
+                            <h3 class="plan-title">BASIC</h3>
+                            <p class="plan-sub">Essential access for independent lifters</p>
+                            <div class="plan-price-row">
+                                <span class="currency">₹</span>
+                                <span class="price-amount">1,999</span>
+                                <span class="billing-cycle">/ month</span>
+                            </div>
+                        </div>
+
+                        <div class="plan-divider"></div>
+
+                        <ul class="plan-features-list">
+                            <li><span class="feat-check">✓</span> Encrypted Contactless RFID Key</li>
+                            <li><span class="feat-check">✓</span> Full Access to Heavy Iron Floor</li>
+                            <li><span class="feat-check">✓</span> Access to Cardio & Functional Deck</li>
+                            <li><span class="feat-check">✓</span> Complimentary Daily Lockers & Showers</li>
+                            <li class="feat-inactive"><span>✕</span> Guest Passes Included</li>
+                            <li class="feat-inactive"><span>✕</span> Contrast Recovery Spa Access</li>
+                        </ul>
+
+                        <a href="#hero" class="btn-pricing-secondary">JOIN BASIC</a>
+                    </div>
+
+                    <!-- Plan 2: PRO (Recommended) -->
+                    <div class="pricing-card featured-pro-card scroll-reveal">
+                        <div class="pro-recommend-pill">RECOMMENDED PLAN</div>
+                        <div class="pricing-card-header">
+                            <h3 class="plan-title">PRO</h3>
+                            <p class="plan-sub">The complete athletic development system</p>
+                            <div class="plan-price-row">
+                                <span class="currency text-accent-red">₹</span>
+                                <span class="price-amount text-accent-red">3,499</span>
+                                <span class="billing-cycle">/ month</span>
+                            </div>
+                        </div>
+
+                        <div class="plan-divider"></div>
+
+                        <ul class="plan-features-list">
+                            <li><span class="feat-check text-accent-red">✓</span> <strong>24/7 Unlimited RFID Access</strong></li>
+                            <li><span class="feat-check text-accent-red">✓</span> Full Facility & Zone Access</li>
+                            <li><span class="feat-check text-accent-red">✓</span> Contrast Recovery Spa & Finnish Sauna</li>
+                            <li><span class="feat-check text-accent-red">✓</span> 2 Complimentary Monthly Guest Passes</li>
+                            <li><span class="feat-check text-accent-red">✓</span> Monthly Biomechanical InBody Scan</li>
+                            <li><span class="feat-check text-accent-red">✓</span> Temple Performance App Access</li>
+                        </ul>
+
+                        <a href="#hero" class="btn-pricing-primary">JOIN PRO NOW</a>
+                    </div>
+
+                    <!-- Plan 3: ELITE -->
+                    <div class="pricing-card scroll-reveal">
+                        <div class="pricing-card-header">
+                            <h3 class="plan-title">ELITE</h3>
+                            <p class="plan-sub">White-glove training & personal coaching</p>
+                            <div class="plan-price-row">
+                                <span class="currency">₹</span>
+                                <span class="price-amount">6,999</span>
+                                <span class="billing-cycle">/ month</span>
+                            </div>
+                        </div>
+
+                        <div class="plan-divider"></div>
+
+                        <ul class="plan-features-list">
+                            <li><span class="feat-check">✓</span> Everything Included in PRO</li>
+                            <li><span class="feat-check">✓</span> <strong>4 Monthly 1-on-1 Coaching Sessions</strong></li>
+                            <li><span class="feat-check">✓</span> Personalized Nutrition & Supplement Plan</li>
+                            <li><span class="feat-check">✓</span> Permanent Reserved VIP Locker</li>
+                            <li><span class="feat-check">✓</span> Unlimited Guest Access (1/visit)</li>
+                            <li><span class="feat-check">✓</span> Direct WhatsApp Coach Priority Line</li>
+                        </ul>
+
+                        <a href="#hero" class="btn-pricing-secondary">JOIN ELITE</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── FINAL CALL TO ACTION ── -->
+        <section class="final-cta-section" id="final-cta">
+            <div class="cta-background-wrap">
+                <img src="/static/img/gym_strength_zone.jpg" alt="Dark atmospheric bodybuilding gym with dramatic lighting" class="cta-bg-img">
+                <div class="cta-dark-overlay"></div>
+                <div class="cta-red-ambient"></div>
+            </div>
+
+            <div class="cta-content-box scroll-reveal">
+                <div class="section-tag-red">DECIDE TODAY</div>
+                <h2 class="cta-headline">YOUR TRANSFORMATION<br>STARTS HERE.</h2>
+                <p class="cta-subtext">
+                    Take the first step toward becoming stronger. Claim your key to the temple and unleash your ultimate potential.
+                </p>
+                <div class="cta-btn-wrapper">
+                    <a href="#memberships" class="btn-cta-giant">JOIN THE GYM</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ── FOOTER ── -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand-col">
+                <div class="brand-logo footer-logo">
+                    <span class="logo-text">TEMPLE</span>
+                    <span class="logo-accent">FITNESS</span>
+                </div>
+                <p class="footer-tagline">
+                    An uncompromising athletic sanctuary engineered for discipline, strength, and transformation. Powered by sub-second RFID access hardware.
+                </p>
+                <div class="footer-status-pill">
+                    <span class="status-indicator-green"></span>
+                    <span>ALL FACILITY DOORS OPERATIONAL</span>
+                </div>
+            </div>
+
+            <div class="footer-links-col">
+                <h4 class="footer-col-title">NAVIGATION</h4>
+                <ul class="footer-links">
+                    <li><a href="#hero">Hero</a></li>
+                    <li><a href="#bench-experience">The Bench Press</a></li>
+                    <li><a href="#programs">Training Programs</a></li>
+                    <li><a href="#about-transition">Philosophy</a></li>
+                    <li><a href="#memberships">Memberships</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-links-col">
+                <h4 class="footer-col-title">FACILITY</h4>
+                <ul class="footer-links">
+                    <li><a href="/media">Interactive Gallery</a></li>
+                    <li><a href="#stats">Coaching Staff</a></li>
+                    <li><a href="/login">Staff Administration</a></li>
+                    <li><a href="#memberships">RFID Card Inquiries</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-links-col">
+                <h4 class="footer-col-title">LOCATION & HOURS</h4>
+                <p class="footer-address">
+                    Sector 4, Central Business District<br>
+                    Indore, MP, India 452001
+                </p>
+                <p class="footer-hours">
+                    <strong>24 HOURS / 365 DAYS</strong><br>
+                    Continuous Keyless Access
+                </p>
+            </div>
+        </div>
+
+        <div class="footer-bottom-bar">
+            <div class="footer-bottom-inner">
+                <p class="copy-text">&copy; 2026 Temple Fitness. All rights reserved. Sculpt. Transcend. Conquer.</p>
+                <div class="footer-badges">
+                    <span class="tech-badge">HIGH PERFORMANCE SCROLL ENGINE</span>
+                    <span class="tech-badge">RFID HARDWARE LINKED</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/static/js/public.js?v=3.5"></script>
+</body>
+</html>

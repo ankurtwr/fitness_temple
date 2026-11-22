@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Fitness Temple — RFID Gym Attendance & Membership Management">
+    <title>{% block title %}Fitness Temple{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    {% if admin %}
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="/" class="nav-brand">
+                <div class="icon">🏛️</div>
+                Fitness Temple
+            </a>
+            <ul class="nav-links">
+                <li><a href="/" class="{{ 'active' if active_page == 'home' }}">Dashboard</a></li>
+                <li><a href="/logs" class="{{ 'active' if active_page == 'logs' }}">Attendance Logs</a></li>
+                <li><a href="/members" class="{{ 'active' if active_page == 'members' }}">Members</a></li>
+                <li><a href="/register" class="{{ 'active' if active_page == 'register' }}">Register</a></li>
+                <li><a href="/renew" class="{{ 'active' if active_page == 'renew' }}">Renew</a></li>
+                <li><a href="/app" target="_blank" style="color: #4ecca3; font-weight: 600;">📱 Mobile App ↗</a></li>
+                <li><a href="/explore" target="_blank" style="color: var(--accent);">Public Site ↗</a></li>
+            </ul>
+            <div class="nav-user">
+                <span class="username">{{ admin.username }}</span>
+                <form action="/logout" method="post" style="margin:0">
+                    <button type="submit" class="btn btn-sm btn-secondary">Logout</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="/static/js/app.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

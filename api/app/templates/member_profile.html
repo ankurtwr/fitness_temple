@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% set active_page = "members" %}
+
+{% block title %}{{ member.name }} — Fitness Temple{% endblock %}
+
+{% block content %}
+<div class="page-header flex-between">
+    <div>
+        <h1>{{ member.name }}</h1>
+        <p>Member since {{ member.created_at.strftime('%d %b %Y') }}</p>
+    </div>
+    <div class="flex gap-1" style="display:flex;gap:8px;align-items:center;">
+        {% if active_card %}
+        <form action="/api/members/{{ member.id }}/revoke-card" method="post" style="margin:0" onsubmit="return confirm('Revoke RFID Card {{ active_card.uid }}?');">
+            <button type="submit" class="btn btn-sm btn-secondary">🚫 Revoke Card</button>
+        </form>
+        {% else %}
+        <a href="/assign-card/{{ member.id }}" class="btn btn-sm btn-primary">📡 Assign Card</a>
+        {% endif %}
+        <form action="/api/members/{{ member.id }}/delete" method="post" style="margin:0" onsubmit="return confirm('⚠️ Permanently delete member {{ member.name }}? All attendance and records will be removed.');">
+            <button type="submit" class="btn btn-sm btn-danger">🗑️ Delete Member</button>
+        </form>
+    </div>
+</div>
+
+<!-- Info Cards Grid -->
+<div class="profile-grid">
+    <!-- Personal Details -->
+    <div class="card">
+        <div class="card-header">
+            <h2>Personal Details</h2>
+        </div>
+        <div class="detail-row">
+            <span class="label">Phone</span>
+            <span class="value">{{ member.phone }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Address</span>
+            <span class="value">{{ member.address or '—' }}</span>
+        </div>
+        {% if member.extra %}
+        {% for key, value in member.extra.items() %}
+        <div class="detail-row">
+            <span class="label">{{ key }}</span>
+            <span class="value">{{ value }}</span>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Membership -->
+    <div class="card">
+        <div class="card-header">
+            <h2>Current Membership</h2>
+            {% if membership %}
+            <span class="badge {{ 'badge-danger' if is_expired else 'badge-success' }}">
+                {{ 'Expired' if is_expired else 'Active' }}
+            </span>
+            {% endif %}
+        </div>
+        {% if membership %}
+        <div class="detail-row">
+            <span class="label">Plan</span>
+            <span class="value">{{ membership.plan.name if membership.plan else '—' }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Start Date</span>
+            <span class="value">{{ membership.start_date.strftime('%d %b %Y') }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="label">End Date</span>
+            <span class="value {{ 'text-danger' if is_expired else 'text-success' }}">
+                {{ membership.end_date.strftime('%d %b %Y') }}
+            </span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Amount Paid</span>
+            <span class="value">₹{{ membership.amount_paid }}</span>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p>No membership found</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Card Status -->
+    <div class="card">
+        <div class="card-header">
+            <h2>RFID Card</h2>
+            {% if active_card %}
+            <span class="badge badge-accent">Active</span>
+            {% else %}
+            <span class="badge badge-warning">No Active Card</span>
+            {% endif %}
+        </div>
+        {% if active_card %}
+        <div class="detail-row">
+            <span class="label">Card UID</span>
+            <span class="value" style="font-family: monospace;">{{ active_card.uid }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Assigned On</span>
+            <span class="value">{{ active_card.assigned_at.strftime('%d %b %Y') }}</span>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p>No card assigned</p>
+            <a href="/assign-card/{{ member.id }}" class="btn btn-sm btn-primary mt-1">Assign Card</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Attendance Summary -->
+    <div class="card">
+        <div class="card-header">
+            <h2>Last 30 Days</h2>
+        </div>
+        <div style="text-align: center; padding: 1rem 0;">
+            <div class="attendance-count">{{ days_in_30 }} <span>/ 30 days</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- Attendance Log -->
+<div class="card">
+    <div class="card-header">
+        <h2>Attendance History</h2>
+    </div>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Check-in Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for att in attendance_records %}
+                <tr>
+                    <td>{{ att.attendance_date.strftime('%d %b %Y (%A)') }}</td>
+                    <td>{{ att.checkin_time.strftime('%I:%M %p') if att.checkin_time else '—' }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="2">
+                        <div class="empty-state">
+                            <p>No attendance in the last 30 days</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Membership History -->
+<div class="card mt-2">
+    <div class="card-header">
+        <h2>Membership History</h2>
+    </div>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Plan</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ms, plan in all_memberships %}
+                <tr>
+                    <td>{{ plan.name }}</td>
+                    <td>{{ ms.start_date.strftime('%d %b %Y') }}</td>
+                    <td>{{ ms.end_date.strftime('%d %b %Y') }}</td>
+                    <td>₹{{ ms.amount_paid }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% set active_page = "home" %}
+
+{% block title %}Dashboard — Fitness Temple{% endblock %}
+
+{% block content %}
+<div class="page-header flex-between">
+    <div>
+        <h1>Live Attendance</h1>
+        <p>Today's check-ins update automatically</p>
+    </div>
+    <div class="live-indicator">
+        <span class="live-dot"></span>
+        LIVE
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Checked In Today</div>
+        <div class="stat-value accent" id="attendance-count">0</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Check-in Time</th>
+                    <th>Membership Expiry</th>
+                </tr>
+            </thead>
+            <tbody id="attendance-tbody">
+                <tr id="empty-state">
+                    <td colspan="4">
+                        <div class="empty-state">
+                            <div class="icon">📋</div>
+                            <p>No check-ins yet today. Attendance will appear here in real time.</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

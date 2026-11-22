@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% set active_page = "logs" %}
+
+{% block title %}Daily Attendance Logs — Fitness Temple{% endblock %}
+
+{% block content %}
+<div class="page-header flex-between">
+    <div>
+        <h1>📅 Daily Attendance Logs</h1>
+        <p>Review check-ins by date and shift (Morning & Evening)</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+        <label for="log-date" style="color:var(--text-muted);font-size:14px;font-weight:600;">Select Date:</label>
+        <input type="date" id="log-date" class="form-control" style="background:var(--bg-card);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:14px;">
+    </div>
+</div>
+
+<div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
+    <div class="stat-card">
+        <div class="stat-label">Total Check-ins</div>
+        <div class="stat-value accent" id="log-total-count">0</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">🌅 Morning Shift (< 1 PM)</div>
+        <div class="stat-value" style="color:#4ecca3;" id="log-morning-count">0</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">🌙 Evening Shift (≥ 1 PM)</div>
+        <div class="stat-value" style="color:#f39c12;" id="log-evening-count">0</div>
+    </div>
+</div>
+
+<!-- Shift Filter Tabs -->
+<div style="display:flex;gap:10px;margin-bottom:16px;">
+    <button class="btn btn-sm btn-primary active-shift-btn" id="btn-shift-all" onclick="setShiftFilter('all')">All Shifts (<span id="tab-cnt-all">0</span>)</button>
+    <button class="btn btn-sm btn-secondary" id="btn-shift-morning" onclick="setShiftFilter('morning')">🌅 Morning (<span id="tab-cnt-morning">0</span>)</button>
+    <button class="btn btn-sm btn-secondary" id="btn-shift-evening" onclick="setShiftFilter('evening')">🌙 Evening (<span id="tab-cnt-evening">0</span>)</button>
+</div>
+
+<div class="card">
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Member Name</th>
+                    <th>Check-in Time</th>
+                    <th>Shift</th>
+                    <th>Membership Expiry</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="logs-tbody">
+                <tr>
+                    <td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted);">
+                        Loading attendance logs...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+let currentLogs = [];
+let activeShift = 'all';
+
+document.addEventListener('DOMContentLoaded', () => {
+    const today = new Date().toISOString().split('T')[0];
+    const dateInput = document.getElementById('log-date');
+    dateInput.value = today;
+    dateInput.addEventListener('change', () => fetchLogs(dateInput.value));
+    fetchLogs(today);
+});
+
+async function fetchLogs(dateStr) {
+    try {
+        const res = await fetch(`/api/attendance/logs?target_date=${dateStr}`);
+        const data = await res.json();
+        currentLogs = data.all || [];
+        document.getElementById('log-total-count').textContent = data.total_count || 0;
+        document.getElementById('log-morning-count').textContent = data.morning_count || 0;
+        document.getElementById('log-evening-count').textContent = data.evening_count || 0;
+        document.getElementById('tab-cnt-all').textContent = data.total_count || 0;
+        document.getElementById('tab-cnt-morning').textContent = data.morning_count || 0;
+        document.getElementById('tab-cnt-evening').textContent = data.evening_count || 0;
+        renderLogsTable();
+    } catch (err) {
+        document.getElementById('logs-tbody').innerHTML = `<tr><td colspan="6" style="text-align:center;color:red;">Error loading logs</td></tr>`;
+    }
+}
+
+function setShiftFilter(shift) {
+    activeShift = shift;
+    ['all', 'morning', 'evening'].forEach(s => {
+        const btn = document.getElementById('btn-shift-' + s);
+        if (s === shift) {
+            btn.className = 'btn btn-sm btn-primary';
+        } else {
+            btn.className = 'btn btn-sm btn-secondary';
+        }
+    });
+    renderLogsTable();
+}
+
+function renderLogsTable() {
+    const tbody = document.getElementById('logs-tbody');
+    let filtered = currentLogs;
+    if (activeShift !== 'all') {
+        filtered = currentLogs.filter(r => r.shift === activeShift);
+    }
+    if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted);">No check-ins recorded for this selection.</td></tr>`;
+        return;
+    }
+    tbody.innerHTML = filtered.map((r, i) => {
+        let badgeHtml = '';
+        if (r.status === 'active') {
+            badgeHtml = `<span style="background:#4ecca322;color:#4ecca3;font-weight:700;padding:3px 8px;border-radius:6px;font-size:12px;">Active (${r.days_left}d left)</span>`;
+        } else if (r.status === 'expiring_soon') {
+            badgeHtml = `<span style="background:#f1c40f22;color:#f39c12;font-weight:700;padding:3px 8px;border-radius:6px;font-size:12px;">⚠️ Expiring in ${r.days_left}d</span>`;
+        } else {
+            badgeHtml = `<span style="background:#e74c3c22;color:#e74c3c;font-weight:700;padding:3px 8px;border-radius:6px;font-size:12px;">Expired</span>`;
+        }
+        const shiftBadge = r.shift === 'morning'
+            ? `<span style="color:#4ecca3;font-weight:600;">🌅 Morning</span>`
+            : `<span style="color:#f39c12;font-weight:600;">🌙 Evening</span>`;
+
+        return `<tr>
+            <td>${i + 1}</td>
+            <td><strong><a href="/members/${r.member_id}" style="color:inherit;text-decoration:none;">${r.name}</a></strong></td>
+            <td>${r.time_str || '--'}</td>
+            <td>${shiftBadge}</td>
+            <td>${r.expiry_date || '—'}</td>
+            <td>${badgeHtml}</td>
+        </tr>`;
+    }).join('');
+}
+</script>
+{% endblock %}

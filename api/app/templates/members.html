@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% set active_page = "members" %}
+
+{% block title %}Members — Fitness Temple{% endblock %}
+
+{% block content %}
+<div class="page-header flex-between">
+    <div>
+        <h1>Members</h1>
+        <p>Search and manage gym members</p>
+    </div>
+    <a href="/register" class="btn btn-primary">+ Register New</a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="member-search" class="form-control"
+                   placeholder="Search by name or phone...">
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Plan</th>
+                    <th>Expiry</th>
+                    <th>Status</th>
+                    <th>Card</th>
+                </tr>
+            </thead>
+            <tbody id="members-tbody">
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <div class="spinner"></div>
+                            <p class="mt-1">Loading members...</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

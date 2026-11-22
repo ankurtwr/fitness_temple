@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% set active_page = "members" %}
+
+{% block title %}Report Lost Card — {{ member.name }}{% endblock %}
+
+{% block content %}
+<div class="page-header flex-between">
+    <div>
+        <h1>Report Lost / Damaged Card</h1>
+        <p>Deactivate RFID access for <strong>{{ member.name }}</strong></p>
+    </div>
+    <a href="/members/{{ member.id }}" class="btn btn-secondary">Back to Profile</a>
+</div>
+
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <div class="card-header">
+        <h2>Card Deactivation</h2>
+    </div>
+
+    {% if active_card %}
+    <div class="alert alert-warning mb-3">
+        ⚠️ Warning: Deactivating this card will immediately deny gym access if scanned at any reader.
+    </div>
+
+    <div style="background: var(--bg-surface); padding: 1.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-bottom: 1.5rem;">
+        <div class="detail-row">
+            <span class="label">Member Name</span>
+            <span class="value">{{ member.name }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Phone</span>
+            <span class="value">{{ member.phone }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Current Active Card UID</span>
+            <span class="value font-mono">{{ active_card.uid }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Assigned At</span>
+            <span class="value">{{ active_card.assigned_at.strftime('%d %b %Y, %I:%M %p') if active_card.assigned_at else '—' }}</span>
+        </div>
+    </div>
+
+    <form id="report-lost-form" data-member-id="{{ member.id }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+        <div class="form-actions flex-between" style="border-top: none; padding-top: 0;">
+            <a href="/members/{{ member.id }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-danger">Deactivate Card</button>
+        </div>
+    </form>
+    {% else %}
+    <div class="empty-state">
+        <div class="icon">ℹ️</div>
+        <p>{{ member.name }} does not currently have an active RFID card.</p>
+        <div class="mt-2">
+            <a href="/assign-card/{{ member.id }}" class="btn btn-primary">Assign New Card</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

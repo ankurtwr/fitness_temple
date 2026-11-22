@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1a2e">
+<title>Fitness Temple Admin</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{--bg:#1a1a2e;--card:#16213e;--deep:#0f3460;--red:#e94560;--green:#4ecca3;--yellow:#f39c12;--text:#fff;--muted:#aaa;--radius:14px}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+  /* ── Screens ── */
+  .screen{display:none;flex-direction:column;min-height:100vh;padding-bottom:76px}
+  .screen.active{display:flex}
+  #screen-login{padding-bottom:0;justify-content:center;align-items:center;padding:24px}
+
+  /* ── Top bar ── */
+  .top-bar{position:sticky;top:0;background:var(--card);border-bottom:1px solid var(--deep);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;z-index:90}
+  .top-bar .brand{font-size:16px;font-weight:800;color:var(--red);display:flex;align-items:center;gap:6px}
+  .top-bar .brand span{color:var(--text)}
+  .top-bar .user-badge{display:flex;align-items:center;gap:10px}
+  .top-bar .user-name{font-size:12px;color:var(--muted);background:var(--deep);padding:4px 8px;border-radius:6px}
+  .logout-btn{background:none;border:1px solid var(--red);color:var(--red);font-size:12px;font-weight:600;padding:4px 10px;border-radius:6px;cursor:pointer}
+
+  /* ── Bottom nav ── */
+  .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--deep);display:flex;z-index:100}
+  .bottom-nav button{flex:1;background:none;border:none;padding:10px 4px 8px;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .2s}
+  .bottom-nav button.active{color:var(--red)}
+  .bottom-nav button span.icon{font-size:20px}
+
+  /* ── Shared ── */
+  .page-header{padding:14px 16px 8px;font-size:19px;font-weight:800;color:var(--text);display:flex;justify-content:space-between;align-items:center}
+  .card{background:var(--card);border-radius:var(--radius);padding:16px;margin:8px 16px}
+  input,select,textarea{width:100%;background:var(--deep);border:none;border-radius:10px;padding:13px;color:var(--text);font-size:15px;outline:none;margin-bottom:12px}
+  input::placeholder,textarea::placeholder{color:var(--muted)}
+  .btn{width:100%;background:var(--red);border:none;border-radius:10px;padding:14px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:6px}
+  .btn.secondary{background:var(--deep)}
+  .btn.warning{background:#d35400}
+  .btn.danger{background:#c0392b}
+  .btn:disabled{opacity:.5}
+  .label{color:var(--muted);font-size:12px;margin-bottom:6px;margin-top:10px;display:block}
+  .error-box{background:#e9456022;color:var(--red);padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:14px}
+  .success-box{background:#4ecca322;color:var(--green);padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:14px}
+  .spinner{display:inline-block;width:20px;height:20px;border:2px solid #fff4;border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ── Status Badges (Green = Active, Yellow = 3 Days, Red = Expired) ── */
+  .badge{display:inline-block;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;white-space:nowrap}
+  .badge.active{background:#4ecca322;color:var(--green);border:1px solid #4ecca344}
+  .badge.expiring_soon{background:#f39c1222;color:var(--yellow);border:1px solid #f39c1244}
+  .badge.expired{background:#e9456022;color:var(--red);border:1px solid #e9456044}
+
+  /* ── Login ── */
+  .login-box{background:var(--card);border-radius:20px;padding:30px;width:100%;max-width:360px}
+  .login-logo{font-size:50px;text-align:center;margin-bottom:8px}
+  .login-title{font-size:24px;font-weight:800;color:var(--red);text-align:center}
+  .login-sub{color:var(--muted);text-align:center;margin-bottom:24px;font-size:14px}
+
+  /* ── Shifts Bar: Two Simple Static Buttons (No dynamic banner) ── */
+  .shifts-bar{display:flex;gap:10px;padding:4px 16px 12px}
+  .shift-btn{flex:1;background:var(--deep);border:2px solid transparent;border-radius:12px;padding:12px 8px;text-align:center;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
+  .shift-btn.active{background:var(--red);color:#fff;border-color:var(--red);box-shadow:0 4px 14px rgba(233,69,96,0.35)}
+
+  /* ── Attendance list ── */
+  .att-row{display:flex;align-items:center;background:var(--card);border-radius:12px;padding:12px;margin:0 16px 8px;gap:12px}
+  .avatar{width:42px;height:42px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;flex-shrink:0}
+  .avatar.active{background:var(--green);color:#1a1a2e}
+  .avatar.expiring_soon{background:var(--yellow);color:#1a1a2e}
+  .avatar.expired{background:#555;color:#aaa}
+  .att-time{color:var(--red);font-weight:700;font-size:13px;white-space:nowrap;text-align:right}
+
+  /* ── Members list ── */
+  .member-row{display:flex;align-items:center;background:var(--card);border-radius:12px;padding:12px;margin:0 16px 8px;gap:12px;cursor:pointer;-webkit-user-select:none}
+  .member-row:active{opacity:.7}
+
+  /* ── Detail ── */
+  .detail-header{display:flex;align-items:center;gap:14px;padding:16px}
+  .big-avatar{width:60px;height:60px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;flex-shrink:0}
+  .big-avatar.active{background:var(--green);color:#1a1a2e}
+  .big-avatar.expiring_soon{background:var(--yellow);color:#1a1a2e}
+  .big-avatar.expired{background:#555}
+  .info-grid{display:flex;flex-wrap:wrap;gap:4px}
+  .info-item{flex:1;min-width:130px;padding:6px}
+  .info-item .info-label{color:var(--muted);font-size:11px}
+  .info-item .info-value{color:var(--text);font-weight:600;font-size:14px;margin-top:2px}
+
+  /* ── Payment history table ── */
+  .pay-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+  .pay-table th{text-align:left;color:var(--muted);padding:6px 4px;font-size:11px;border-bottom:1px solid var(--deep)}
+  .pay-table td{padding:8px 4px;border-bottom:1px solid #162a4a}
+
+  /* ── Plan cards ── */
+  .plan-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px}
+  .plan-card{flex:1;min-width:120px;background:var(--deep);border-radius:12px;padding:12px;border:2px solid transparent;text-align:center;cursor:pointer}
+  .plan-card.selected{border-color:var(--red)}
+  .plan-name{font-weight:700;font-size:13px}
+  .plan-price{color:var(--red);font-size:18px;font-weight:800;margin:3px 0}
+  .plan-days{color:var(--muted);font-size:11px}
+
+  /* ── Assign card waiting ── */
+  .assign-waiting{text-align:center;padding:16px}
+  .countdown{font-size:28px;font-weight:800;color:var(--red)}
+
+  /* ── Search ── */
+  .search-wrap{padding:4px 16px 8px}
+  .empty{color:var(--muted);text-align:center;padding:40px 16px;font-size:14px}
+  .back-btn{background:none;border:none;color:var(--red);font-size:14px;font-weight:700;padding:12px 16px 4px;cursor:pointer;display:flex;align-items:center;gap:6px}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ TOP BAR ══════════════ -->
+<header id="top-bar" class="top-bar" style="display:none">
+  <div class="brand">🏋️ <span>Fitness Temple</span></div>
+  <div class="user-badge">
+    <span class="user-name" id="user-display">admin</span>
+    <button class="logout-btn" onclick="doLogout()">Logout</button>
+  </div>
+</header>
+
+<!-- ══════════════ LOGIN ══════════════ -->
+<div id="screen-login" class="screen">
+  <div class="login-box">
+    <div class="login-logo">🏋️</div>
+    <div class="login-title">Fitness Temple</div>
+    <div class="login-sub">Admin Portal</div>
+    <div id="login-error" class="error-box" style="display:none"></div>
+    <input type="text" id="login-user" placeholder="Username" autocomplete="username">
+    <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password">
+    <button class="btn" id="login-btn" onclick="doLogin()">Login</button>
+  </div>
+</div>
+
+<!-- ══════════════ ATTENDANCE ══════════════ -->
+<div id="screen-attendance" class="screen">
+  <div class="page-header">
+    <div>📋 Today's Attendance <span id="att-count" style="color:var(--red)"></span></div>
+    <button onclick="loadAttendance()" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer" title="Refresh">🔄</button>
+  </div>
+
+  <!-- Two Fixed Shift Buttons: Morning & Evening -->
+  <div class="shifts-bar">
+    <button class="shift-btn active" id="btn-shift-morning" onclick="setShift('morning')">
+      🌅 Morning Shift (<span id="cnt-morning">0</span>)
+    </button>
+    <button class="shift-btn" id="btn-shift-evening" onclick="setShift('evening')">
+      🌙 Evening Shift (<span id="cnt-evening">0</span>)
+    </button>
+  </div>
+
+  <div class="search-wrap">
+    <input type="search" id="att-search" placeholder="Search attendee name…" oninput="renderAttendance()">
+  </div>
+  <div id="att-list"></div>
+  <div id="att-empty" class="empty" style="display:none">No check-ins recorded for this shift today.</div>
+</div>
+
+<!-- ══════════════ MEMBERS ══════════════ -->
+<div id="screen-members" class="screen">
+  <div class="page-header">
+    <div>👥 Members (<span id="mem-count">0</span>)</div>
+    <button class="btn" style="width:auto;padding:8px 14px;font-size:13px;margin:0" onclick="navigate('register')">+ Add</button>
+  </div>
+  <div class="search-wrap">
+    <input type="search" id="mem-search" placeholder="Search by name or phone…" oninput="searchMembers()">
+  </div>
+  <div id="mem-list"></div>
+  <div id="mem-empty" class="empty" style="display:none">No members found.</div>
+</div>
+
+<!-- ══════════════ MEMBER DETAIL ══════════════ -->
+<div id="screen-detail" class="screen">
+  <button class="back-btn" onclick="navigate('members')">← Back to Members</button>
+  
+  <div class="detail-header">
+    <div id="det-avatar" class="big-avatar">?</div>
+    <div style="flex:1">
+      <div id="det-name" style="font-size:20px;font-weight:700"></div>
+      <div id="det-phone" style="color:var(--muted);font-size:13px;margin-top:2px"></div>
+      <div id="det-badge" style="margin-top:6px"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">Current Plan</div><div class="info-value" id="det-plan">—</div></div>
+      <div class="info-item"><div class="info-label">Valid Until</div><div class="info-value" id="det-expiry">—</div></div>
+      <div class="info-item"><div class="info-label">RFID Card UID</div><div class="info-value" id="det-card">—</div></div>
+      <div class="info-item"><div class="info-label">Address</div><div class="info-value" id="det-addr">—</div></div>
+    </div>
+  </div>
+
+  <!-- Card Actions -->
+  <div class="card">
+    <div style="font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:10px">RFID Card Management</div>
+    <div id="assign-status"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" id="assign-btn" style="flex:1" onclick="startAssign()">📡 Assign RFID</button>
+      <button class="btn warning" id="revoke-btn" style="flex:1;display:none" onclick="doRevokeCard()">🚫 Revoke Card</button>
+    </div>
+  </div>
+
+  <!-- Membership Renewal -->
+  <div class="card">
+    <div style="font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:10px">Membership</div>
+    <button class="btn secondary" onclick="navigate('renew/' + currentMember.id)">🔄 Renew Membership</button>
+  </div>
+
+  <!-- Payment History for Every Month -->
+  <div class="card">
+    <div style="font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:10px">💰 Payment & Renewal History</div>
+    <div id="det-payments">
+      <div style="color:var(--muted);font-size:13px">Loading payment records...</div>
+    </div>
+  </div>
+
+  <!-- Permanent Delete Member -->
+  <div class="card" style="border:1px solid #c0392b44">
+    <div style="font-size:12px;color:#e74c3c;font-weight:700;text-transform:uppercase;margin-bottom:6px">Danger Zone</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Permanently remove this member, their attendance history, and card assignment.</p>
+    <button class="btn danger" onclick="doDeleteMember()">🗑️ Permanently Delete Member</button>
+  </div>
+</div>
+
+<!-- ══════════════ REGISTER ══════════════ -->
+<div id="screen-register" class="screen">
+  <button class="back-btn" onclick="navigate('members')">← Back to Members</button>
+  <div class="page-header" style="padding-top:2px">Register New Member</div>
+  <div style="padding:0 16px">
+    <div id="reg-msg"></div>
+    <span class="label">Full Name *</span>
+    <input type="text" id="reg-name" placeholder="e.g. Rahul Sharma">
+    <span class="label">Phone Number *</span>
+    <input type="tel" id="reg-phone" placeholder="10-digit mobile number">
+    <span class="label">Address</span>
+    <textarea id="reg-addr" rows="2" placeholder="Optional" style="resize:none"></textarea>
+    
+    <span class="label">Select Membership Plan *</span>
+    <div class="plan-grid" id="reg-plans"></div>
+
+    <span class="label">Amount Paid (₹)</span>
+    <input type="number" id="reg-amount" placeholder="0">
+
+    <button class="btn" id="reg-btn" onclick="doRegister()">Confirm & Register</button>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- ══════════════ RENEW ══════════════ -->
+<div id="screen-renew" class="screen">
+  <button class="back-btn" onclick="navigate('detail/' + (currentMember?.id || ''))">← Back to Member</button>
+  <div class="page-header" style="padding-top:2px">Renew Membership — <span id="ren-name"></span></div>
+  <div style="padding:0 16px">
+    <div id="ren-msg"></div>
+    <span class="label">Select Renewal Plan *</span>
+    <div class="plan-grid" id="ren-plans"></div>
+
+    <span class="label">Amount Paid (₹)</span>
+    <input type="number" id="ren-amount" placeholder="0">
+
+    <button class="btn" id="ren-btn" onclick="doRenew()">🔄 Confirm Renewal</button>
+  </div>
+</div>
+
+<!-- ══════════════ DAY-WISE LOGS ══════════════ -->
+<div id="screen-logs" class="screen">
+  <div class="page-header">
+    <div>📅 Attendance Logs</div>
+    <input type="date" id="log-date-picker" style="width:auto;margin:0;padding:6px 10px;font-size:13px;border-radius:8px" onchange="loadDateLogs(this.value)">
+  </div>
+
+  <div class="shifts-bar" style="margin-top:4px">
+    <button class="shift-btn active" id="log-btn-morning" onclick="setLogShift('morning')">
+      🌅 Morning (<span id="log-cnt-morning">0</span>)
+    </button>
+    <button class="shift-btn" id="log-btn-evening" onclick="setLogShift('evening')">
+      🌙 Evening (<span id="log-cnt-evening">0</span>)
+    </button>
+  </div>
+
+  <div id="log-list" style="margin-top:6px"></div>
+  <div id="log-empty" class="empty" style="display:none">No check-ins found for this date.</div>
+</div>
+
+<!-- ══════════════ BOTTOM NAV ══════════════ -->
+<nav class="bottom-nav" id="bottom-nav" style="display:none">
+  <button id="tab-attendance" onclick="navigate('attendance')">
+    <span class="icon">📋</span>Attendance
+  </button>
+  <button id="tab-members" onclick="navigate('members')">
+    <span class="icon">👥</span>Members
+  </button>
+  <button id="tab-logs" onclick="navigate('logs')">
+    <span class="icon">📅</span>Day Logs
+  </button>
+</nav>
+
+<script>
+// ── Server session passed via Jinja template (prevents login prompt on refresh) ──
+const SERVER_TOKEN = "{{ initial_token or '' }}";
+const SERVER_USERNAME = "{{ initial_username or '' }}";
+
+// ── Global State ──
+let TOKEN = null;
+let USERNAME = null;
+let allAttendance = [];
+let allMembers = [];
+let currentMember = null;
+let currentShift = new Date().getHours() < 13 ? 'morning' : 'evening';
+let currentLogShift = 'morning';
+let currentAssignId = null;
+let assignPollTimer = null;
+let attPollTimer = null;
+let selectedRegPlan = null;
+let selectedRenPlan = null;
+let plans = [];
+
+const DEFAULT_PLANS = [
+  { id: 1, name: "1 Month", duration_days: 30, price: 1000 },
+  { id: 2, name: "3 Months", duration_days: 90, price: 2000 },
+  { id: 3, name: "6 Months", duration_days: 180, price: 4000 },
+  { id: 4, name: "12 Months", duration_days: 365, price: 7000 }
+];
+
+// ── Navigation & Persistence (Never resets to login on refresh) ──
+function navigate(route) {
+  if (window.location.hash === '#' + route) {
+    handleRoute();
+  } else {
+    window.location.hash = '#' + route;
+  }
+}
+
+window.addEventListener('hashchange', handleRoute);
+
+function handleRoute() {
+  if (!TOKEN) {
+    showScreen('login');
+    return;
+  }
+  const hash = (window.location.hash || '').replace(/^#/, '') || 'attendance';
+  localStorage.setItem('ft_last_route', hash);
+
+  if (hash === 'attendance') {
+    setActiveNav('attendance');
+    showScreen('attendance');
+    startAttPoll();
+  } else if (hash === 'members') {
+    setActiveNav('members');
+    showScreen('members');
+    loadMembers();
+  } else if (hash === 'logs') {
+    setActiveNav('logs');
+    showScreen('logs');
+    initLogsScreen();
+  } else if (hash === 'register') {
+    setActiveNav('members');
+    showScreen('register');
+    document.getElementById('reg-msg').innerHTML = '';
+  } else if (hash.startsWith('detail/')) {
+    setActiveNav('members');
+    const memberId = parseInt(hash.split('/')[1]);
+    openMember(memberId);
+  } else if (hash.startsWith('renew/')) {
+    setActiveNav('members');
+    const memberId = parseInt(hash.split('/')[1]);
+    openRenew(memberId);
+  } else {
+    navigate('attendance');
+  }
+}
+
+function setActiveNav(tab) {
+  ['attendance', 'members', 'logs'].forEach(t => {
+    document.getElementById('tab-' + t)?.classList.remove('active');
+  });
+  document.getElementById('tab-' + tab)?.classList.add('active');
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ── Authentication ──
+async function doLogin() {
+  const user = document.getElementById('login-user').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-error');
+  if (!user || !pass) { showErr(err, 'Please enter username and password.'); return; }
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+  err.style.display = 'none';
+  try {
+    const r = await fetch('/api/login', {
+      method: 'POST',
+      body: new URLSearchParams({ username: user, password: pass }),
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      credentials: 'same-origin'
+    });
+    const d = await r.json();
+    if (d.token) {
+      TOKEN = d.token;
+      USERNAME = d.username;
+      localStorage.setItem('ft_token', TOKEN);
+      localStorage.setItem('ft_user', USERNAME);
+      showMainApp();
+    } else {
+      showErr(err, d.error || 'Invalid username or password');
+    }
+  } catch(e) { showErr(err, 'Server unreachable. Check connection.'); }
+  btn.disabled = false;
+  btn.textContent = 'Login';
+}
+
+function showErr(el, msg) { el.textContent = msg; el.style.display = 'block'; }
+
+function showMainApp() {
+  document.getElementById('user-display').textContent = USERNAME || 'admin';
+  document.getElementById('top-bar').style.display = 'flex';
+  document.getElementById('bottom-nav').style.display = 'flex';
+  loadPlans();
+  const currentHash = (window.location.hash || '').replace(/^#/, '');
+  const savedRoute = currentHash || localStorage.getItem('ft_last_route') || 'attendance';
+  window.location.hash = '#' + savedRoute;
+  handleRoute();
+}
+
+async function doLogout() {
+  TOKEN = null;
+  USERNAME = null;
+  localStorage.removeItem('ft_token');
+  localStorage.removeItem('ft_user');
+  localStorage.removeItem('ft_last_route');
+  clearInterval(attPollTimer);
+  clearInterval(assignPollTimer);
+  document.getElementById('bottom-nav').style.display = 'none';
+  document.getElementById('top-bar').style.display = 'none';
+  window.location.hash = '';
+  showScreen('login');
+  try { await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' }); } catch(e){}
+}
+
+// ── API Helper ──
+async function api(method, path, body = null) {
+  const opts = {
+    method,
+    headers: {
+      Authorization: `Bearer ${TOKEN}`,
+      Accept: 'application/json'
+    },
+    credentials: 'same-origin'
+  };
+  if (body) {
+    opts.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+    opts.body = new URLSearchParams(body).toString();
+  }
+  const r = await fetch(path, opts);
+  if (r.status === 401) {
+    doLogout();
+    return {};
+  }
+  return r.json();
+}
+
+// ── Status Badge Generator ──
+function getStatusBadge(status, daysLeft) {
+  if (status === 'active') {
+    return `<span class="badge active">Active (${daysLeft}d left)</span>`;
+  } else if (status === 'expiring_soon') {
+    return `<span class="badge expiring_soon">⚠️ Expiring in ${daysLeft}d</span>`;
+  } else {
+    return `<span class="badge expired">Expired</span>`;
+  }
+}
+
+// ── Attendance Screen (Fixed Morning & Evening Buttons) ──
+function startAttPoll() {
+  loadAttendance();
+  clearInterval(attPollTimer);
+  attPollTimer = setInterval(loadAttendance, 5000);
+}
+
+async function loadAttendance() {
+  try {
+    const d = await api('GET', '/api/attendance/today');
+    if (d.rows) {
+      allAttendance = d.rows.reverse();
+      updateShiftCounts();
+      renderAttendance();
+    }
+  } catch(e){}
+}
+
+function updateShiftCounts() {
+  const mCnt = allAttendance.filter(r => r.shift === 'morning').length;
+  const eCnt = allAttendance.filter(r => r.shift === 'evening').length;
+  document.getElementById('cnt-morning').textContent = mCnt;
+  document.getElementById('cnt-evening').textContent = eCnt;
+  document.getElementById('att-count').textContent = `(${allAttendance.length})`;
+}
+
+function setShift(shift) {
+  currentShift = shift;
+  document.getElementById('btn-shift-morning').classList.toggle('active', shift === 'morning');
+  document.getElementById('btn-shift-evening').classList.toggle('active', shift === 'evening');
+  renderAttendance();
+}
+
+function renderAttendance() {
+  const q = document.getElementById('att-search').value.toLowerCase();
+  let list = allAttendance.filter(r => r.shift === currentShift);
+  if (q) {
+    list = list.filter(r => r.name.toLowerCase().includes(q));
+  }
+  const el = document.getElementById('att-list');
+  const empty = document.getElementById('att-empty');
+  if (!list.length) {
+    el.innerHTML = '';
+    empty.style.display = 'block';
+    empty.textContent = `No check-ins for ${currentShift === 'morning' ? 'Morning' : 'Evening'} shift today.`;
+    return;
+  }
+  empty.style.display = 'none';
+  el.innerHTML = list.map(r => {
+    const shiftIcon = r.shift === 'morning' ? '🌅' : '🌙';
+    return `<div class="att-row" onclick="navigate('detail/${r.member_id}')" style="cursor:pointer">
+      <div class="avatar ${r.status || 'expired'}">${r.name[0]}</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:15px">${esc(r.name)}</div>
+        <div style="margin-top:3px">${getStatusBadge(r.status, r.days_left)}</div>
+      </div>
+      <div class="att-time">
+        <div>${r.time_str || '--'}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${shiftIcon} ${r.shift}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Members Screen ──
+let memberSearchTimer = null;
+function searchMembers() {
+  clearTimeout(memberSearchTimer);
+  memberSearchTimer = setTimeout(() => loadMembers(document.getElementById('mem-search').value), 300);
+}
+
+async function loadMembers(q = '') {
+  try {
+    const d = await api('GET', '/api/members' + (q ? '?search=' + encodeURIComponent(q) : ''));
+    if (d.members) {
+      allMembers = d.members;
+      document.getElementById('mem-count').textContent = allMembers.length;
+      renderMembers();
+    }
+  } catch(e){}
+}
+
+function renderMembers() {
+  const el = document.getElementById('mem-list');
+  const empty = document.getElementById('mem-empty');
+  if (!allMembers.length) {
+    el.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  el.innerHTML = allMembers.map(m => `
+    <div class="member-row" onclick="navigate('detail/${m.id}')">
+      <div class="avatar ${m.status}">${m.name[0]}</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:15px">${esc(m.name)}</div>
+        <div style="color:var(--muted);font-size:12px;margin-top:2px">${esc(m.phone)}</div>
+      </div>
+      <div style="text-align:right">
+        <div>${getStatusBadge(m.status, m.days_left)}</div>
+        <div style="color:var(--muted);font-size:11px;margin-top:4px">${esc(m.current_plan || 'No plan')}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Member Detail ──
+async function openMember(id) {
+  showScreen('detail');
+  document.getElementById('assign-status').innerHTML = '';
+  document.getElementById('det-payments').innerHTML = '<div style="color:var(--muted);font-size:13px">Loading details...</div>';
+  
+  const cached = allMembers.find(x => x.id === id);
+  if (cached) renderDetail(cached);
+
+  try {
+    const m = await api('GET', '/api/members/' + id);
+    if (m.id) {
+      currentMember = m;
+      renderDetail(m);
+    }
+  } catch(e){}
+}
+
+function renderDetail(m) {
+  currentMember = m;
+  document.getElementById('det-avatar').textContent = m.name?.[0] || '?';
+  document.getElementById('det-avatar').className = 'big-avatar ' + (m.status || 'expired');
+  document.getElementById('det-name').textContent = m.name || '';
+  document.getElementById('det-phone').textContent = m.phone || '';
+  document.getElementById('det-badge').innerHTML = getStatusBadge(m.status, m.days_left);
+  document.getElementById('det-plan').textContent = m.plan_name || m.current_plan || '—';
+  document.getElementById('det-expiry').textContent = m.expiry_date || '—';
+  document.getElementById('det-card').textContent = m.has_active_card ? `✅ ${m.card_uid || 'Active'}` : '❌ No Card';
+  document.getElementById('det-addr').textContent = m.address || '—';
+
+  const revokeBtn = document.getElementById('revoke-btn');
+  revokeBtn.style.display = m.has_active_card ? 'block' : 'none';
+
+  const payEl = document.getElementById('det-payments');
+  if (m.payments && m.payments.length > 0) {
+    payEl.innerHTML = `
+      <table class="pay-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Plan</th>
+            <th>Amount</th>
+            <th>Valid Period</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${m.payments.map(p => `
+            <tr>
+              <td><strong>${p.date}</strong></td>
+              <td>${esc(p.plan_name)}</td>
+              <td style="color:var(--green);font-weight:700">₹${p.amount_paid}</td>
+              <td style="color:var(--muted);font-size:11px">${p.start_date} → ${p.end_date}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>`;
+  } else {
+    payEl.innerHTML = '<div style="color:var(--muted);font-size:13px">No past renewal payments recorded.</div>';
+  }
+}
+
+// ── Card Assignment & Revocation ──
+async function startAssign() {
+  if (!currentMember) return;
+  clearInterval(assignPollTimer);
+  const btn = document.getElementById('assign-btn');
+  btn.disabled = true;
+  document.getElementById('assign-status').innerHTML = `
+    <div class="assign-waiting">
+      <div class="spinner" style="width:32px;height:32px;border-width:3px;margin:0 auto 10px"></div>
+      <div style="color:var(--muted);font-size:13px;margin-bottom:6px">Tap RFID card on reader now...</div>
+      <div class="countdown" id="assign-countdown">30</div>
+    </div>`;
+  try {
+    const d = await api('POST', `/api/members/${currentMember.id}/assign-card`, { csrf_token: '' });
+    if (!d.success) {
+      document.getElementById('assign-status').innerHTML = `<div class="error-box">${d.error || 'Failed'}</div>`;
+      btn.disabled = false;
+      return;
+    }
+    currentAssignId = d.assignment_id;
+    let secs = 30;
+    assignPollTimer = setInterval(async () => {
+      secs--;
+      const cd = document.getElementById('assign-countdown');
+      if (cd) cd.textContent = secs;
+      if (secs <= 0) {
+        clearInterval(assignPollTimer);
+        document.getElementById('assign-status').innerHTML = `<div class="error-box">⏱ Timed out. Tap card within 30s.</div>`;
+        btn.disabled = false;
+        return;
+      }
+      try {
+        const s = await api('GET', `/api/assign/status?assignment_id=${currentAssignId}`);
+        if (s.status === 'done') {
+          clearInterval(assignPollTimer);
+          document.getElementById('assign-status').innerHTML = `<div class="success-box">✅ Card assigned: ${s.card_uid}</div>`;
+          btn.disabled = false;
+          openMember(currentMember.id);
+        }
+      } catch(e){}
+    }, 1000);
+  } catch(e) {
+    document.getElementById('assign-status').innerHTML = `<div class="error-box">Network error</div>`;
+    btn.disabled = false;
+  }
+}
+
+async function doRevokeCard() {
+  if (!currentMember) return;
+  if (!confirm(`Are you sure you want to revoke the RFID card for ${currentMember.name}?`)) return;
+  try {
+    const res = await api('POST', `/api/members/${currentMember.id}/revoke-card`);
+    if (res.success) {
+      alert(`Card revoked successfully for ${currentMember.name}`);
+      openMember(currentMember.id);
+    } else {
+      alert(res.error || 'Could not revoke card');
+    }
+  } catch(e) { alert('Network error'); }
+}
+
+async function doDeleteMember() {
+  if (!currentMember) return;
+  const confirmed = confirm(`⚠️ PERMANENT DELETE\n\nAre you sure you want to permanently delete ${currentMember.name}?\nAll attendance, payment history, and RFID cards will be erased.`);
+  if (!confirmed) return;
+  try {
+    const res = await api('POST', `/api/members/${currentMember.id}/delete`);
+    if (res.success) {
+      alert(`Member ${currentMember.name} deleted.`);
+      navigate('members');
+    } else {
+      alert(res.error || 'Could not delete member');
+    }
+  } catch(e) { alert('Network error'); }
+}
+
+// ── Plans & Pricing ──
+async function loadPlans() {
+  try {
+    const d = await api('GET', '/api/plans');
+    if (d.plans && d.plans.length) {
+      plans = d.plans;
+    } else {
+      plans = DEFAULT_PLANS;
+    }
+  } catch(e){
+    plans = DEFAULT_PLANS;
+  }
+  selectedRegPlan = plans[0];
+  selectedRenPlan = plans[0];
+  renderPlanGrid('reg-plans', selectedRegPlan, 'reg-amount');
+  renderPlanGrid('ren-plans', selectedRenPlan, 'ren-amount');
+}
+
+function renderPlanGrid(containerId, selected, amountInputId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = plans.map(p => `
+    <div class="plan-card ${selected?.id === p.id ? 'selected' : ''}" onclick="pickPlan(${p.id}, '${containerId}', '${amountInputId}')">
+      <div class="plan-name">${esc(p.name)}</div>
+      <div class="plan-price">₹${p.price}</div>
+      <div class="plan-days">${p.duration_days} days</div>
+    </div>`).join('');
+}
+
+function pickPlan(planId, containerId, amountInputId) {
+  const p = plans.find(x => x.id === planId);
+  if (!p) return;
+  if (containerId === 'reg-plans') selectedRegPlan = p;
+  else selectedRenPlan = p;
+  document.getElementById(amountInputId).value = p.price;
+  renderPlanGrid(containerId, p, amountInputId);
+}
+
+// ── Register Member ──
+async function doRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const phone = document.getElementById('reg-phone').value.trim();
+  const addr = document.getElementById('reg-addr').value.trim();
+  const amount = document.getElementById('reg-amount').value;
+  const msg = document.getElementById('reg-msg');
+  if (!name || !phone || !selectedRegPlan) {
+    msg.innerHTML = '<div class="error-box">Please enter full name, phone number, and pick a plan.</div>';
+    return;
+  }
+  const btn = document.getElementById('reg-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+  try {
+    const d = await api('POST', '/api/members', {
+      name, phone, address: addr,
+      plan_id: selectedRegPlan.id,
+      amount_paid: amount || selectedRegPlan.price,
+      extra_json: '{}', csrf_token: ''
+    });
+    if (d.success) {
+      msg.innerHTML = `<div class="success-box">✅ ${name} registered successfully!</div>`;
+      document.getElementById('reg-name').value = '';
+      document.getElementById('reg-phone').value = '';
+      document.getElementById('reg-addr').value = '';
+      setTimeout(() => navigate(`detail/${d.member_id}`), 1200);
+    } else {
+      msg.innerHTML = `<div class="error-box">${d.error || 'Registration failed'}</div>`;
+    }
+  } catch(e) { msg.innerHTML = '<div class="error-box">Network error</div>'; }
+  btn.disabled = false;
+  btn.textContent = 'Confirm & Register';
+}
+
+// ── Renew Membership ──
+function openRenew(memberId) {
+  showScreen('renew');
+  document.getElementById('ren-name').textContent = currentMember?.name || `Member #${memberId}`;
+  document.getElementById('ren-msg').innerHTML = '';
+  if (selectedRenPlan) document.getElementById('ren-amount').value = selectedRenPlan.price;
+}
+
+async function doRenew() {
+  if (!selectedRenPlan || !currentMember) return;
+  const amount = document.getElementById('ren-amount').value;
+  const msg = document.getElementById('ren-msg');
+  const btn = document.getElementById('ren-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+  try {
+    const d = await api('POST', `/api/members/${currentMember.id}/renew`, {
+      plan_id: selectedRenPlan.id,
+      amount_paid: amount || selectedRenPlan.price,
+      csrf_token: ''
+    });
+    if (d.success) {
+      msg.innerHTML = `<div class="success-box">✅ ${d.message}</div>`;
+      setTimeout(() => navigate(`detail/${currentMember.id}`), 1200);
+    } else {
+      msg.innerHTML = `<div class="error-box">${d.error || 'Renewal failed'}</div>`;
+    }
+  } catch(e) { msg.innerHTML = '<div class="error-box">Network error</div>'; }
+  btn.disabled = false;
+  btn.textContent = '🔄 Confirm Renewal';
+}
+
+// ── Day-Wise Attendance Logs Screen ──
+let logRecords = [];
+
+function initLogsScreen() {
+  const picker = document.getElementById('log-date-picker');
+  if (!picker.value) {
+    picker.value = new Date().toISOString().split('T')[0];
+  }
+  loadDateLogs(picker.value);
+}
+
+async function loadDateLogs(dateStr) {
+  try {
+    const data = await api('GET', `/api/attendance/logs?target_date=${dateStr}`);
+    logRecords = data.all || [];
+    document.getElementById('log-cnt-morning').textContent = data.morning_count || 0;
+    document.getElementById('log-cnt-evening').textContent = data.evening_count || 0;
+    renderLogList();
+  } catch(e){}
+}
+
+function setLogShift(shift) {
+  currentLogShift = shift;
+  document.getElementById('log-btn-morning').classList.toggle('active', shift === 'morning');
+  document.getElementById('log-btn-evening').classList.toggle('active', shift === 'evening');
+  renderLogList();
+}
+
+function renderLogList() {
+  let list = logRecords.filter(r => r.shift === currentLogShift);
+  const el = document.getElementById('log-list');
+  const empty = document.getElementById('log-empty');
+  if (!list.length) {
+    el.innerHTML = '';
+    empty.style.display = 'block';
+    empty.textContent = `No check-ins for ${currentLogShift === 'morning' ? 'Morning' : 'Evening'} shift on this date.`;
+    return;
+  }
+  empty.style.display = 'none';
+  el.innerHTML = list.map(r => `
+    <div class="att-row" onclick="navigate('detail/${r.member_id}')" style="cursor:pointer">
+      <div class="avatar ${r.status || 'expired'}">${r.name[0]}</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:15px">${esc(r.name)}</div>
+        <div style="margin-top:3px">${getStatusBadge(r.status, r.days_left)}</div>
+      </div>
+      <div class="att-time">
+        <div>${r.time_str || '--'}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${r.shift === 'morning' ? '🌅 Morning' : '🌙 Evening'}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Utilities ──
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('login-user').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('login-pass').focus(); });
+
+// ── Startup & Session Persistence ──
+(function init() {
+  const token = (SERVER_TOKEN && SERVER_TOKEN.trim() !== '') ? SERVER_TOKEN : localStorage.getItem('ft_token');
+  const user = (SERVER_USERNAME && SERVER_USERNAME.trim() !== '') ? SERVER_USERNAME : localStorage.getItem('ft_user');
+
+  if (token && token.trim() !== '') {
+    TOKEN = token;
+    USERNAME = user || 'admin';
+    localStorage.setItem('ft_token', TOKEN);
+    localStorage.setItem('ft_user', USERNAME);
+    showMainApp();
+  } else {
+    showScreen('login');
+  }
+})();
+</script>
+</body>
+</html>

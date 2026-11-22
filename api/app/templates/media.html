@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Temple Fitness Media Showcase — Interactive 3D perspective gallery and architectural photography.">
+    <title>Media Showcase — Temple Fitness</title>
+    <link rel="stylesheet" href="/static/css/public.css">
+    <style>
+        /* Shutter Iris 6-Blade Geometric Aperture SVG */
+        .iris-blade {
+            fill: #00d4aa;
+            transform-origin: center;
+            opacity: 0.85;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Scroll Progress -->
+    <div id="scroll-progress"></div>
+
+    <!-- Floating Liquid Glass Nav -->
+    <header class="public-nav-wrapper">
+        <nav class="public-nav">
+            <a href="/explore" class="brand-link">
+                <div class="brand-pill">🏛️</div>
+                <span class="brand-name">Temple Fitness</span>
+            </a>
+
+            <ul class="nav-menu">
+                <li><a href="/explore#overview">Overview</a></li>
+                <li><a href="/explore#zones">Zones</a></li>
+                <li><a href="/explore#plans">Memberships</a></li>
+                <li><a href="/media" class="active">Media Gallery</a></li>
+            </ul>
+
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <a href="/explore" class="nav-cta-btn">Back to Gym ✦</a>
+                <a href="/login" class="nav-menu" style="font-size: 0.8rem; color: var(--text-muted); text-decoration: none;" title="Staff / Admin Access">Staff</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="section-container" style="padding-top: 8.5rem;">
+        <div style="text-align: center;">
+            <div class="hero-pill-badge">
+                <span class="dot"></span>
+                INTERACTIVE 3D PERSPECTIVE GALLERY
+            </div>
+
+            <h1 class="section-heading" style="font-size: clamp(2.5rem, 6vw, 4.5rem);">
+                THE TEMPLE <span class="gradient-span">IN MOTION</span>
+            </h1>
+
+            <p style="color: var(--text-secondary); max-width: 620px; margin: 0 auto;">
+                Hover over any card to trigger 3D perspective tilting with real-time specular glare. Click any frame to activate the 6-blade shutter iris zoom.
+            </p>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="gallery-filters">
+            <button class="filter-btn active" data-filter="all">All Zones</button>
+            <button class="filter-btn" data-filter="strength">Strength Arena</button>
+            <button class="filter-btn" data-filter="cardio">Cardio Deck</button>
+            <button class="filter-btn" data-filter="functional">Functional Turf</button>
+            <button class="filter-btn" data-filter="recovery">Recovery Spa</button>
+        </div>
+
+        <!-- 3D Tilt Gallery Grid -->
+        <div class="gallery-grid" id="gallery-container">
+            
+            <!-- Card 1: Strength Floor -->
+            <div class="tilt-card" data-category="strength" data-title="Olympic Power Racks & Calibrated Iron" data-tag="Strength Arena" data-src="/static/img/gallery-1.jpg">
+                <div class="tilt-inner">
+                    <img src="/static/img/gallery-1.jpg" alt="Olympic Power Racks" class="gallery-visual" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="gallery-fallback" style="display: none;">
+                        <div class="zone-icon">🏋️</div>
+                        <h4 style="font-family: 'Archivo'; font-size: 1.1rem; color: #fff;">Heavy Iron Floor</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">Drop your photos to static/img/gallery-1.jpg</p>
+                    </div>
+                    <div class="gallery-glare"></div>
+                    <div class="gallery-card-overlay">
+                        <span class="gallery-card-tag">Strength Arena</span>
+                        <h3 class="gallery-card-title">Olympic Power Racks</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Dumbbells -->
+            <div class="tilt-card" data-category="strength" data-title="Precision Matte Dumbbell Arrays" data-tag="Strength Arena" data-src="/static/img/gallery-2.jpg">
+                <div class="tilt-inner">
+                    <img src="/static/img/gallery-2.jpg" alt="Precision Dumbbells" class="gallery-visual" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="gallery-fallback" style="display: none;">
+                        <div class="zone-icon">⚡</div>
+                        <h4 style="font-family: 'Archivo'; font-size: 1.1rem; color: #fff;">Dumbbell Array</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">Drop your photos to static/img/gallery-2.jpg</p>
+                    </div>
+                    <div class="gallery-glare"></div>
+                    <div class="gallery-card-overlay">
+                        <span class="gallery-card-tag">Strength Arena</span>
+                        <h3 class="gallery-card-title">Free Weights & Dumbbells</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Cardio Skyline -->
+            <div class="tilt-card" data-category="cardio" data-title="Panoramic Skyline Cardio Deck" data-tag="Cardio Deck" data-src="/static/img/gallery-3.jpg">
+                <div class="tilt-inner">
+                    <img src="/static/img/gallery-3.jpg" alt="Cardio Deck" class="gallery-visual" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="gallery-fallback" style="display: none;">
+                        <div class="zone-icon">🏃</div>
+                        <h4 style="font-family: 'Archivo'; font-size: 1.1rem; color: #fff;">Skyline Runners</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">Drop your photos to static/img/gallery-3.jpg</p>
+                    </div>
+                    <div class="gallery-glare"></div>
+                    <div class="gallery-card-overlay">
+                        <span class="gallery-card-tag">Cardio Deck</span>
+                        <h3 class="gallery-card-title">Panoramic Digital Runners</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Assault & Erg -->
+            <div class="tilt-card" data-category="cardio" data-title="High-Cadence Ergometers & Rowers" data-tag="Cardio Deck" data-src="/static/img/gallery-4.jpg">
+                <div class="tilt-inner">
+                    <img src="/static/img/gallery-4.jpg" alt="Assault Rowers" class="gallery-visual" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="gallery-fallback" style="display: none;">
+                        <div class="zone-icon">🚣</div>
+                        <h4 style="font-family: 'Archivo'; font-size: 1.1rem; color: #fff;">Ergometer Rowers</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">Drop your photos to static/img/gallery-4.jpg</p>
+                    </div>
+                    <div class="gallery-glare"></div>
+                    <div class="gallery-card-overlay">
+                        <span class="gallery-card-tag">Cardio Deck</span>
+                        <h3 class="gallery-card-title">Assault Bikes & Rowers</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 5: Turf Sprint -->
+            <div class="tilt-card" data-category="functional" data-title="30-Meter High-Traction Sled Turf" data-tag="Functional Turf" data-src="/static/img/gallery-5.jpg">
+                <div class="tilt-inner">
+                    <img src="/static/img/gallery-5.jpg" alt="Athletic Turf" class="gallery-visual" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="gallery-fallback" style="display: none;">
+                        <div class="zone-icon">🔥</div>
+                        <h4 style="font-family: 'Archivo'; font-size: 1.1rem; color: #fff;">Sled Sprint Track</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">Drop your photos to static/img/gallery-5.jpg</p>
+                    </div>
+                    <div class="gallery-glare"></div>
+                    <div class="gallery-card-overlay">
+                        <span class="gallery-card-tag">Functional Turf</span>
+                        <h3 class="gallery-card-title">Athletic Sled Sprint Track</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 6: Functional Rig -->
+            <div class="tilt-card" data-category="functional" data-title="Crossfit Rigs & Gymnastic Rings" data-tag="Functional Turf" data-src="/static/img/gallery-6.jpg">
+                <div class="tilt-inner">
+                    <img src="/static/img/gallery-6.jpg" alt="Functional Rig" class="gallery-visual" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="gallery-fallback" style="display: none;">
+                        <div class="zone-icon">🎯</div>
+                        <h4 style="font-family: 'Archivo'; font-size: 1.1rem; color: #fff;">Crossfit Rig</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">Drop your photos to static/img/gallery-6.jpg</p>
+                    </div>
+                    <div class="gallery-glare"></div>
+                    <div class="gallery-card-overlay">
+                        <span class="gallery-card-tag">Functional Turf</span>
+                        <h3 class="gallery-card-title">Battle Ropes & Pull Up Rigs</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 7: Sauna -->
+            <div class="tilt-card" data-category="recovery" data-title="Cedarwood Infrared Finnish Sauna" data-tag="Recovery Spa" data-src="/static/img/gallery-7.jpg">
+                <div class="tilt-inner">
+                    <img src="/static/img/gallery-7.jpg" alt="Infrared Sauna" class="gallery-visual" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="gallery-fallback" style="display: none;">
+                        <div class="zone-icon">🧖</div>
+                        <h4 style="font-family: 'Archivo'; font-size: 1.1rem; color: #fff;">Infrared Sauna</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">Drop your photos to static/img/gallery-7.jpg</p>
+                    </div>
+                    <div class="gallery-glare"></div>
+                    <div class="gallery-card-overlay">
+                        <span class="gallery-card-tag">Recovery Spa</span>
+                        <h3 class="gallery-card-title">Infrared Finnish Sauna</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 8: Cold Plunge -->
+            <div class="tilt-card" data-category="recovery" data-title="Sub-Zero Contrast Cold Plunge Tubs" data-tag="Recovery Spa" data-src="/static/img/gallery-8.jpg">
+                <div class="tilt-inner">
+                    <img src="/static/img/gallery-8.jpg" alt="Cold Plunge" class="gallery-visual" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="gallery-fallback" style="display: none;">
+                        <div class="zone-icon">❄️</div>
+                        <h4 style="font-family: 'Archivo'; font-size: 1.1rem; color: #fff;">Cold Plunge</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">Drop your photos to static/img/gallery-8.jpg</p>
+                    </div>
+                    <div class="gallery-glare"></div>
+                    <div class="gallery-card-overlay">
+                        <span class="gallery-card-tag">Recovery Spa</span>
+                        <h3 class="gallery-card-title">Dual Contrast Cold Plunge</h3>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Shutter Iris Lightbox Modal -->
+    <div class="lightbox-modal" id="lightbox-modal">
+        <!-- 6-Blade Aperture Shutter Effect -->
+        <div class="iris-wrapper">
+            <svg class="iris-blade-container" viewBox="0 0 100 100">
+                <polygon points="50,10 60,35 40,35" class="iris-blade" style="transform: rotate(0deg);"></polygon>
+                <polygon points="50,10 60,35 40,35" class="iris-blade" style="transform: rotate(60deg);"></polygon>
+                <polygon points="50,10 60,35 40,35" class="iris-blade" style="transform: rotate(120deg);"></polygon>
+                <polygon points="50,10 60,35 40,35" class="iris-blade" style="transform: rotate(180deg);"></polygon>
+                <polygon points="50,10 60,35 40,35" class="iris-blade" style="transform: rotate(240deg);"></polygon>
+                <polygon points="50,10 60,35 40,35" class="iris-blade" style="transform: rotate(300deg);"></polygon>
+            </svg>
+        </div>
+
+        <div class="lightbox-content">
+            <button class="lightbox-close-btn" id="lightbox-close" title="Close (Esc)">✕</button>
+            <div class="lightbox-image-box">
+                <img src="" alt="Enlarged Gym View" id="lightbox-img">
+            </div>
+            <div class="lightbox-meta">
+                <div>
+                    <span class="gallery-card-tag" id="lightbox-tag">Facility</span>
+                    <h3 class="gallery-card-title" id="lightbox-title" style="font-size: 1.5rem; margin-top: 0.2rem;">Temple Zone</h3>
+                </div>
+                <div style="color: var(--text-muted); font-size: 0.8rem; font-weight: 500;">
+                    Use [ ← / → ] keys to browse
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="public-footer">
+        <div class="footer-inner">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div class="brand-pill" style="width: 28px; height: 28px; font-size: 0.85rem;">🏛️</div>
+                <strong style="font-family: 'Archivo'; letter-spacing: -0.02em;">TEMPLE FITNESS</strong>
+            </div>
+
+            <ul class="footer-nav">
+                <li><a href="/explore">Overview</a></li>
+                <li><a href="/explore#zones">Zones</a></li>
+                <li><a href="/explore#plans">Memberships</a></li>
+                <li><a href="/media">Media Showcase</a></li>
+                <li><a href="/login">Staff Administration</a></li>
+            </ul>
+
+            <p class="footer-copy">
+                &copy; 2026 Temple Fitness. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <script src="/static/js/public.js"></script>
+</body>
+</html>

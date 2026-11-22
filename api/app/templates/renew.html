@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% set active_page = "renew" %}
+
+{% block title %}Renew Membership — Fitness Temple{% endblock %}
+
+{% block content %}
+<div class="page-header flex-between">
+    <div>
+        <h1>Renew Membership</h1>
+        <p>Extend member subscription by selecting their plan.</p>
+    </div>
+    <a href="/members" class="btn btn-secondary">Back to Members</a>
+</div>
+
+<div style="max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem;">
+    <!-- Step 1: Member Search -->
+    <div class="card">
+        <div class="card-header">
+            <h2>1. Find Member</h2>
+        </div>
+
+        <div class="form-group search-dropdown-wrapper" style="position: relative;">
+            <label for="renew-member-search">Search Member by Name or Phone</label>
+            <div class="search-bar" style="max-width: 100%;">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="renew-member-search" class="form-control" placeholder="Type member name or phone..." autocomplete="off">
+            </div>
+            <div id="renew-dropdown" class="dropdown-menu hidden"></div>
+        </div>
+
+        <div id="selected-member" class="card hidden mt-2" style="background: var(--bg-surface); border: 1px solid var(--border);">
+            <!-- Populated via JS -->
+        </div>
+    </div>
+
+    <!-- Step 2: Renewal Form -->
+    <div id="renew-form" class="card hidden">
+        <div class="card-header">
+            <h2>2. Select Plan & Payment</h2>
+        </div>
+
+        <form id="renew-submit-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" id="renew-member-id" name="member_id" value="">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="renew_plan_id">Renewal Plan *</label>
+                    <select id="renew_plan_id" name="plan_id" class="form-control" required>
+                        <option value="" disabled selected>Select plan...</option>
+                        {% for p in plans %}
+                        <option value="{{ p.id }}" data-price="{{ "%.0f"|format(p.price) }}">
+                            {{ p.name }} — ₹{{ "%.0f"|format(p.price) }} ({{ p.duration_days }} days)
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="renew_amount_paid">Amount Paid (₹) *</label>
+                    <input type="number" id="renew_amount_paid" name="amount_paid" class="form-control" step="0.01" required placeholder="e.g. 1000">
+                </div>
+            </div>
+
+            <div class="form-actions flex-between">
+                <p class="text-muted" style="font-size: 0.85rem;">Active days are preserved: future renewals begin after current expiry.</p>
+                <button type="submit" class="btn btn-primary">Renew Membership</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

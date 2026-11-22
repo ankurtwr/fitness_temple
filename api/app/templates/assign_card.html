@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% set active_page = "members" %}
+
+{% block title %}Assign RFID Card — {{ member.name }}{% endblock %}
+
+{% block content %}
+<div class="page-header flex-between">
+    <div>
+        <h1>Assign RFID Card</h1>
+        <p>Pair an RFID card with <strong>{{ member.name }}</strong> (Phone: {{ member.phone }})</p>
+    </div>
+    <a href="/members/{{ member.id }}" class="btn btn-secondary">Back to Profile</a>
+</div>
+
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <div id="assign-container" data-member-id="{{ member.id }}" data-csrf="{{ csrf_token }}">
+        <div class="assign-status">
+            <div class="waiting-icon">💳</div>
+            <h3>Ready to Link RFID Card</h3>
+            <p>Click the button below, then tap a new RFID card on any gym entrance reader within 30 seconds.</p>
+            <div class="mt-3">
+                <button id="start-assign-btn" class="btn btn-primary btn-lg">Start Assignment</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
